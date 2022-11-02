@@ -60,3 +60,20 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+
+{{- define "slapd.managerDN" -}}
+cn=manager,{{ .Values.suffix }}
+{{- end }}
+
+{{- define "slapd.replicatorDN" -}}
+cn=replicator,{{ .Values.suffix }}
+{{- end }}
+
+{{- define "slapd.usersOU" -}}
+ou=users,{{ .Values.suffix }}
+{{- end }}
+
+{{- define "slapd.servicesOU" -}}
+ou=services,{{ .Values.suffix }}
+{{- end }}

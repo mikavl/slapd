@@ -14,6 +14,8 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+suffix: dc=home,dc=arpa
+
 persistence:
   storageClassName: ""
   size: 1Gi
