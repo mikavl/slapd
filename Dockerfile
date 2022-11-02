@@ -19,3 +19,5 @@ RUN apt-get update \
       /data \
       /etc/ldap/slapd.d \
       /run/slapd
+
+COPY --chown=root:root etc /etc/
