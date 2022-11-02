@@ -42,7 +42,7 @@ data:
     olcDatabase: {0}config
     olcRootDN: cn=admin,cn=config
     olcAccess: to *
-      by dn.exact=gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth manage
+      by dn.exact="{{ include "slapd.identityDN" . }}" manage
       by * break
 
     dn: cn=schema,cn=config
@@ -59,7 +59,7 @@ data:
     olcDatabase: {1}monitor
     olcMonitoring: FALSE
     olcAccess: to *
-      by dn.exact="gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth" read
+      by dn.exact="{{ include "slapd.identityDN" . }}" read
       by * break
 
     dn: olcDatabase={2}mdb,cn=config
@@ -87,18 +87,18 @@ data:
       schemachecking=on
       retry="10 +"
     olcAccess: to attrs=userPassword
-      by dn.exact="gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth" manage
+      by dn.exact="{{ include "slapd.identityDN" . }}" manage
       by dn.exact="{{ include "slapd.managerDN" . }}" write
       by self write
       by anonymous auth
       by * none
     olcAccess: to attrs=shadowLastChange
-      by dn.exact="gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth" manage
+      by dn.exact="{{ include "slapd.identityDN" . }}" manage
       by dn.exact="{{ include "slapd.managerDN" . }}" write
       by self write
       by * none
     olcAccess: to *
-      by dn.exact="gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth" manage
+      by dn.exact="{{ include "slapd.identityDN" . }}" manage
       by dn.exact="{{ include "slapd.managerDN" . }}" write
       by dn.one="{{ include "slapd.servicesOU" . }}" read
       by dn.one="{{ include "slapd.usersOU" . }}" read
@@ -160,7 +160,7 @@ data:
     olcDatabase: {0}config
     olcRootDN: cn=admin,cn=config
     olcAccess: to *
-      by dn.exact=gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth manage
+      by dn.exact="{{ include "slapd.identityDN" . }}" manage
       by * break
 
     dn: cn=schema,cn=config
@@ -182,7 +182,7 @@ data:
     olcRootDN: cn=admin,cn=accesslog
     olcDbIndex: entryCSN,objectClass,reqEnd,reqResult,reqStart,reqDN eq
     olcAccess: to *
-      by dn.exact="gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth" read
+      by dn.exact="{{ include "slapd.identityDN" . }}" read
       by dn.exact="{{ include "slapd.replicatorDN" . }}" read
       by * break
 
@@ -198,7 +198,7 @@ data:
     olcDatabase: {2}monitor
     olcMonitoring: FALSE
     olcAccess: to *
-      by dn.exact="gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth" read
+      by dn.exact="{{ include "slapd.identityDN" . }}" read
       by * break
 
     dn: olcDatabase={3}mdb,cn=config
@@ -214,20 +214,20 @@ data:
     olcDbIndex: automountKey,automountMapName,cn,gidNumber,member,memberOf,memberUid,objectClass,uid,uidNumber eq
     olcDbIndex: entryCSN,entryUUID eq
     olcAccess: to attrs=userPassword
-      by dn.exact="gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth" manage
+      by dn.exact="{{ include "slapd.identityDN" . }}" manage
       by dn.exact="{{ include "slapd.managerDN" . }}" write
       by dn.exact="{{ include "slapd.replicatorDN" . }}" read
       by self write
       by anonymous auth
       by * none
     olcAccess: to attrs=shadowLastChange
-      by dn.exact="gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth" manage
+      by dn.exact="{{ include "slapd.identityDN" . }}" manage
       by dn.exact="{{ include "slapd.managerDN" . }}" write
       by dn.exact="{{ include "slapd.replicatorDN" . }}" read
       by self write
       by * none
     olcAccess: to *
-      by dn.exact="gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth" manage
+      by dn.exact="{{ include "slapd.identityDN" . }}" manage
       by dn.exact="{{ include "slapd.managerDN" . }}" write
       by dn.exact="{{ include "slapd.replicatorDN" . }}" read
       by dn.one="{{ include "slapd.servicesOU" . }}" read

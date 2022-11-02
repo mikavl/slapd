@@ -61,6 +61,9 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+{{- define "slapd.identityDN" -}}
+gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth
+{{- end }}
 
 {{- define "slapd.managerDN" -}}
 cn=manager,{{ .Values.suffix }}
