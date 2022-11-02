@@ -123,6 +123,26 @@ data:
     olcOverlay: refint
     olcRefintAttribute: member memberOf
 
+  haproxy.cfg: |
+    defaults
+      mode    tcp
+      option  tcplog
+      timeout connect 5000
+      timeout client  50000
+      timeout server  50000
+
+    # TODO: TLS termination
+    frontend ldaps
+      bind *:10636
+      default_backend ldapi
+
+    frontend ldaps-syncrepl
+      bind *:10637
+      default_backend ldapi
+
+    backend ldapi
+      server ldapi unix@/run/slapd/ldapi
+
   provider.ldif: |
     dn: cn=config
     objectClass: olcGlobal

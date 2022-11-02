@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "slapd.fullname" . }}
   labels:
@@ -42,6 +42,7 @@ spec:
         - name: config
           configMap:
             name: {{ include "slapd.fullname" . }}
+            defaultMode: 0600
         - name: etc
           emptyDir: {}
         - name: run
@@ -61,10 +62,14 @@ spec:
               drop:
                 - all
           command:
-            - /usr/local/bin/init-volume
+            - /usr/local/bin/init-volumes
           volumeMounts:
             - name: {{ include "slapd.fullname" . }}
               mountPath: /data
+            - name: etc
+              mountPath: /etc/ldap/slapd.d
+            - name: run
+              mountPath: /run/slapd
         - name: init-config
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -76,6 +81,8 @@ spec:
             - name: config
               mountPath: /config
               readOnly: true
+            - name: {{ include "slapd.fullname" . }}
+              mountPath: /data
             - name: etc
               mountPath: /etc/ldap/slapd.d
       containers:
