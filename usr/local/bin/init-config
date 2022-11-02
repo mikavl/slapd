@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+rm -rf /etc/ldap/slapd.d/*
+
+if [ "xslapd-0" = "x$(hostname)" ]; then
+  SLAPD_CONFIG="provider.ldif"
+else
+  SLAPD_CONFIG="consumer.ldif"
+fi
+
+slapadd -F "/etc/ldap/slapd.d" -l "/config/${SLAPD_CONFIG}" -n 0
