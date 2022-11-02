@@ -48,7 +48,7 @@ spec:
         - name: run
           emptyDir: {}
       initContainers:
-        - name: init-volume
+        - name: init-volumes
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
