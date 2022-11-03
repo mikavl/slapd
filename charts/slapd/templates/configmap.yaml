@@ -75,7 +75,7 @@ data:
     olcDbIndex: automountKey,automountMapName,cn,gidNumber,member,memberOf,memberUid,objectClass,uid,uidNumber eq
     olcDbIndex: entryCSN,entryUUID eq
     olcSyncRepl: rid=000
-      provider=slapd-0.slapd.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+      provider="{{ include "slapd.providerURL" . }}"
       type=refreshAndPersist
       searchbase="{{ .Values.suffix }}"
       bindmethod=simple
@@ -124,24 +124,27 @@ data:
     olcRefintAttribute: member memberOf
 
   haproxy.cfg: |
+    global
+      log stdout format raw local0
+
     defaults
+      log     global
       mode    tcp
       option  tcplog
       timeout connect 5000
       timeout client  50000
       timeout server  50000
 
-    # TODO: TLS termination
     frontend ldaps
-      bind *:10636
+      bind *:10636 ssl crt /certs/slapd.pem
       default_backend ldapi
 
     frontend ldaps-syncrepl
-      bind *:10637
+      bind *:10637 ssl crt /certs/syncrepl.pem
       default_backend ldapi
 
     backend ldapi
-      server ldapi unix@/run/slapd/ldapi
+      server slapd unix@/run/slapd/ldapi
 
   provider.ldif: |
     dn: cn=config
@@ -192,10 +195,18 @@ data:
     include: file:///etc/ldap/schema/rfc2307bis.ldif
     include: file:///etc/ldap/schema/inetorgperson.ldif
 
-    dn: olcDatabase={1}mdb,cn=config
+    dn: olcDatabase={1}monitor,cn=config
+    objectClass: olcDatabaseConfig
+    olcDatabase: {1}monitor
+    olcMonitoring: FALSE
+    olcAccess: to *
+      by dn.exact="{{ include "slapd.identityDN" . }}" read
+      by * break
+
+    dn: olcDatabase={2}mdb,cn=config
     objectClass: olcDatabaseConfig
     objectClass: olcMdbConfig
-    olcDatabase: {1}mdb
+    olcDatabase: {2}mdb
     olcDbMaxSize: 1073741824
     olcDbDirectory: /data/accesslog
     olcSuffix: cn=accesslog
@@ -206,20 +217,12 @@ data:
       by dn.exact="{{ include "slapd.replicatorDN" . }}" read
       by * break
 
-    dn: olcOverlay=syncprov,olcDatabase={1}mdb,cn=config
+    dn: olcOverlay=syncprov,olcDatabase={2}mdb,cn=config
     objectClass: olcOverlayConfig
     objectClass: olcSyncProvConfig
     olcOverlay: syncprov
     olcSpNoPresent: TRUE
     olcSpReloadHint: TRUE
-
-    dn: olcDatabase={2}monitor,cn=config
-    objectClass: olcDatabaseConfig
-    olcDatabase: {2}monitor
-    olcMonitoring: FALSE
-    olcAccess: to *
-      by dn.exact="{{ include "slapd.identityDN" . }}" read
-      by * break
 
     dn: olcDatabase={3}mdb,cn=config
     objectClass: olcDatabaseConfig
