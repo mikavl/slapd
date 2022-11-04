@@ -39,9 +39,13 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
-        - name: certs
+        - name: certs-external
           secret:
-            secretName: {{ include "slapd.fullname" . }}
+            secretName: {{ include "slapd.fullname" . }}-internal
+            defaultMode: 0400
+        - name: certs-internal
+          secret:
+            secretName: {{ include "slapd.fullname" . }}-internal
             defaultMode: 0400
         - name: config
           configMap:
@@ -121,8 +125,11 @@ spec:
               containerPort: 10637
               protocol: TCP
           volumeMounts:
-            - name: certs
-              mountPath: /certs
+            - name: certs-external
+              mountPath: /certs/external
+              readOnly: true
+            - name: certs-internal
+              mountPath: /certs/internal
               readOnly: true
             - name: config
               mountPath: /config
