@@ -80,3 +80,7 @@ ou=users,{{ .Values.suffix }}
 {{- define "slapd.servicesOU" -}}
 ou=services,{{ .Values.suffix }}
 {{- end }}
+
+{{- define "slapd.providerURL" -}}
+ldaps://{{ include "slapd.fullname" . }}-0.{{ include "slapd.fullname" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}:10637
+{{- end }}

@@ -15,6 +15,7 @@ RUN apt-get update \
     \
  && rm -rf /etc/ldap/slapd.d /run/slapd /var/lib/ldap \
  && install -d -m 0700 -o root -g root \
+      /certs \
       /config \
       /data \
       /etc/ldap/slapd.d \
