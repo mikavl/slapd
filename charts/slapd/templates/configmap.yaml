@@ -136,11 +136,11 @@ data:
       timeout server  50000
 
     frontend ldaps
-      bind *:10636 ssl crt /certs
+      bind *:10636 ssl crt /certs/external/cert.pem
       default_backend ldapi
 
     frontend ldaps-syncrepl
-      bind *:10637 ssl crt /certs
+      bind *:10637 ssl crt /certs/internal/cert.pem
       default_backend ldapi
 
     backend ldapi
