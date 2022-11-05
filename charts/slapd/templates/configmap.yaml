@@ -75,8 +75,8 @@ data:
     olcDbIndex: automountKey,automountMapName,cn,gidNumber,member,memberOf,memberUid,objectClass,uid,uidNumber eq
     olcDbIndex: entryCSN,entryUUID eq
     olcSyncRepl: rid=000
-      provider="ldapi:///run/slapd/haproxy"
-      type=refreshAndPersist
+      provider="ldapi://%2Frun%2Fslapd%2Fhaproxy"
+      type=refreshOnly
       searchbase="{{ .Values.suffix }}"
       bindmethod=simple
       binddn="{{ include "slapd.replicatorDN" . }}"
@@ -85,7 +85,8 @@ data:
       logbase="cn=accesslog"
       logfilter="(&(objectClass=auditWriteObject)(reqResult=0))"
       schemachecking=on
-      retry="10 +"
+      retry="60 +"
+      interval="00:00:05:00"
     olcAccess: to attrs=userPassword
       by dn.exact="{{ include "slapd.identityDN" . }}" manage
       by dn.exact="{{ include "slapd.managerDN" . }}" write
@@ -136,19 +137,22 @@ data:
       timeout server  50000
 
     frontend ldaps
-      bind *:10636 ssl crt /certs/external/cert.pem
+      bind *:10636 ssl crt /secrets/external/cert.pem
       default_backend ldapi
 
     frontend ldaps-syncrepl
-      bind *:10637 ssl crt /certs/internal/cert.pem
+      bind *:10637 ssl crt /secrets/internal/cert.pem
       default_backend ldapi
 
     frontend ldapi-syncrepl
       bind /run/slapd/haproxy
-      server slapd {{ include "slapd.commonName" . }}:10637 ca-file /secrets/internal/ca.pem
+      default_backend ldaps-syncrepl
 
     backend ldapi
       server ldapi /run/slapd/ldapi
+
+    backend ldaps-syncrepl
+      server slapd {{ include "slapd.provider" . }} ssl ca-file /secrets/internal/ca.pem
 
   provider.ldif: |
     dn: cn=config
