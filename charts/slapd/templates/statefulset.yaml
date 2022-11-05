@@ -37,13 +37,17 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
-        - name: certs-external
+        - name: secrets-external
           secret:
             secretName: {{ include "slapd.fullname" . }}-external
             defaultMode: 0400
-        - name: certs-internal
+        - name: secrets-internal
           secret:
             secretName: {{ include "slapd.fullname" . }}-internal
+            defaultMode: 0400
+        - name: secrets-syncrepl
+          secret:
+            secretName: {{ include "slapd.fullname" . }}-syncrepl
             defaultMode: 0400
         - name: config
           configMap:
@@ -84,11 +88,11 @@ spec:
           command:
             - /usr/local/bin/init-config
           volumeMounts:
-            - name: certs-internal
-              mountPath: /certs/internal
-              readOnly: true
             - name: config
               mountPath: /config
+              readOnly: true
+            - name: secrets-syncrepl
+              mountPath: /secrets/syncrepl
               readOnly: true
             - name: {{ include "slapd.fullname" . }}
               mountPath: /data
@@ -105,9 +109,6 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
-            - name: certs-internal
-              mountPath: /certs/internal
-              readOnly: true
             - name: {{ include "slapd.fullname" . }}
               mountPath: /data
             - name: etc
@@ -129,11 +130,11 @@ spec:
               containerPort: 10637
               protocol: TCP
           volumeMounts:
-            - name: certs-external
-              mountPath: /certs/external
+            - name: secrets-external
+              mountPath: /secrets/external
               readOnly: true
-            - name: certs-internal
-              mountPath: /certs/internal
+            - name: secrets-internal
+              mountPath: /secrets/internal
               readOnly: true
             - name: config
               mountPath: /config
