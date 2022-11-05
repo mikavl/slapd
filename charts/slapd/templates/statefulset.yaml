@@ -102,6 +102,9 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
+            - name: certs-internal
+              mountPath: /certs/internal
+              readOnly: true
             - name: {{ include "slapd.fullname" . }}
               mountPath: /data
             - name: etc
