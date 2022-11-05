@@ -84,6 +84,9 @@ spec:
           command:
             - /usr/local/bin/init-config
           volumeMounts:
+            - name: certs-internal
+              mountPath: /certs/internal
+              readOnly: true
             - name: config
               mountPath: /config
               readOnly: true
