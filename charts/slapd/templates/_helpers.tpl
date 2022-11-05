@@ -81,6 +81,10 @@ ou=users,{{ .Values.suffix }}
 ou=services,{{ .Values.suffix }}
 {{- end }}
 
+{{- define "slapd.commonName" -}}
+{{ include "slapd.fullname" . }}-0.{{ include "slapd.fullname" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{- end }}
+
 {{- define "slapd.providerURL" -}}
-ldaps://{{ include "slapd.fullname" . }}-0.{{ include "slapd.fullname" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}:10637
+ldaps://{{ include "slapd.commonName" . }}:10637
 {{- end }}
