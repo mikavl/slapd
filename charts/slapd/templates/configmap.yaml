@@ -80,7 +80,7 @@ data:
       searchbase="{{ .Values.suffix }}"
       bindmethod=simple
       binddn="{{ include "slapd.replicatorDN" . }}"
-      credentials="{{ randAlphaNum 20 }}"
+      credentials="@CREDENTIALS@"
       syncdata=accesslog
       logbase="cn=accesslog"
       logfilter="(&(objectClass=auditWriteObject)(reqResult=0))"

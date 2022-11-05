@@ -6,9 +6,7 @@ metadata:
     {{- include "slapd.labels" . | nindent 4 }}
 spec:
   serviceName: {{ include "slapd.fullname" . }}
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "slapd.selectorLabels" . | nindent 6 }}
@@ -41,7 +39,7 @@ spec:
       volumes:
         - name: certs-external
           secret:
-            secretName: {{ include "slapd.fullname" . }}-internal
+            secretName: {{ include "slapd.fullname" . }}-external
             defaultMode: 0400
         - name: certs-internal
           secret:
