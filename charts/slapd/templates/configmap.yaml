@@ -75,7 +75,7 @@ data:
     olcDbIndex: automountKey,automountMapName,cn,gidNumber,member,memberOf,memberUid,objectClass,uid,uidNumber eq
     olcDbIndex: entryCSN,entryUUID eq
     olcSyncRepl: rid=000
-      provider="{{ include "slapd.providerURL" . }}"
+      provider="ldapi:///run/slapd/haproxy"
       type=refreshAndPersist
       searchbase="{{ .Values.suffix }}"
       bindmethod=simple
@@ -143,8 +143,12 @@ data:
       bind *:10637 ssl crt /certs/internal/cert.pem
       default_backend ldapi
 
+    frontend ldapi-syncrepl
+      bind /run/slapd/haproxy
+      server slapd {{ include "slapd.commonName" . }}:10637 ca-file /secrets/internal/ca.pem
+
     backend ldapi
-      server slapd unix@/run/slapd/ldapi
+      server ldapi /run/slapd/ldapi
 
   provider.ldif: |
     dn: cn=config

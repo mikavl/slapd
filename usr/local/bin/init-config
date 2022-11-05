@@ -10,5 +10,5 @@ else
   SLAPD_CONFIG="consumer.ldif"
 fi
 
-sed -E "s/@CREDENTIALS@/$(cat /certs/internal/secret)/g" /config/${SLAPD_CONFIG} \
+sed -E "s/@CREDENTIALS@/$(cat /secrets/syncrepl/secret)/g" /config/${SLAPD_CONFIG} \
   | slapadd -F "/etc/ldap/slapd.d" -n 0
