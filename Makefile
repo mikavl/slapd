@@ -4,7 +4,23 @@ export OPENSSL_CONF
 CA_SUBJ = /CN=slapd
 CERT_SUBJ = /CN=*.slapd.openldap.svc.cluster.local
 
-secrets:
+define MESSAGE
+================================================================================
+
+Modify the kustomization.yaml in the 'examples' directory as needed.
+Check the resources to be applied:
+
+    kubectl kustomize examples
+
+Then, apply the resources:
+
+    kubectl apply -k examples
+
+================================================================================
+endef
+export MESSAGE
+
+certs:
 	$(eval TMPDIR := $(shell mktemp -d))
 
 	cp ./examples/openssl.cnf $(TMPDIR)
@@ -34,4 +50,10 @@ secrets:
 
 	rm -rf $(TMPDIR)
 
-.PHONY: secrets
+secret:
+	head /dev/urandom | tr -dc A-Za-z0-9 | head -c 30 > ./examples/secret
+	echo "$$MESSAGE"
+
+secrets: certs secret
+
+.PHONY: certs secret secrets

@@ -1,0 +1,19 @@
+---
+
+namespace: openldap
+
+resources:
+  - namespace.yaml
+
+secretGenerator:
+  - name: slapd-internal
+    files:
+      - ca.pem
+      - cert.pem
+    options:
+      disableNameSuffixHash: true
+  - name: slapd-syncrepl
+    files:
+      - secret
+    options:
+      disableNameSuffixHash: true
