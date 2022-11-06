@@ -52,8 +52,8 @@ certs:
 
 secret:
 	head /dev/urandom | tr -dc A-Za-z0-9 | head -c 30 > ./examples/secret
-	echo "$$MESSAGE"
 
 secrets: certs secret
+	echo "$$MESSAGE"
 
 .PHONY: certs secret secrets
