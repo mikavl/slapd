@@ -6,10 +6,15 @@ resources:
   - namespace.yaml
 
 secretGenerator:
+  - name: slapd-external
+    files:
+      - cert.pem=external.pem
+    options:
+      disableNameSuffixHash: true
   - name: slapd-internal
     files:
       - ca.pem
-      - cert.pem
+      - cert.pem=internal.pem
     options:
       disableNameSuffixHash: true
   - name: slapd-syncrepl
