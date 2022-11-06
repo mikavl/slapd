@@ -131,6 +131,7 @@ data:
     defaults
       log     global
       mode    tcp
+      option  dontlognull
       option  tcplog
       timeout connect 5000
       timeout client  50000
