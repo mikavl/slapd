@@ -2,6 +2,14 @@
 
 set -e
 
+echo "Waiting for haproxy"
+
+while [ ! -S /run/slapd/haproxy ]; do
+  sleep 5
+done
+
+echo "Starting slapd"
+
 ulimit -n 1024
 
 exec /usr/sbin/slapd -d stats -F /etc/ldap/slapd.d -h "ldapi:///"
