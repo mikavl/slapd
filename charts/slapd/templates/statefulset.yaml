@@ -57,6 +57,9 @@ spec:
           emptyDir: {}
         - name: run
           emptyDir: {}
+          # Use the resources of the slapd process
+          resources:
+            {{- toYaml .Values.resources.slapd | nindent 12 }}
       initContainers:
         - name: init-volumes
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -98,6 +101,9 @@ spec:
               mountPath: /data
             - name: etc
               mountPath: /etc/ldap/slapd.d
+          # Use the resources of the slapd process
+          resources:
+            {{- toYaml .Values.resources.slapd | nindent 12 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -106,8 +112,14 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - /usr/local/bin/exec-slapd
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+          readinessProbe:
+            exec:
+              command:
+                - /usr/local/bin/health-slapd
+          livenessProbe:
+            exec:
+              command:
+                - /usr/local/bin/health-slapd
           volumeMounts:
             - name: {{ include "slapd.fullname" . }}
               mountPath: /data
@@ -115,6 +127,8 @@ spec:
               mountPath: /etc/ldap/slapd.d
             - name: run
               mountPath: /run/slapd
+          resources:
+            {{- toYaml .Values.resources.slapd | nindent 12 }}
         - name: haproxy
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -122,6 +136,12 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - /usr/local/bin/exec-haproxy
+          readinessProbe:
+            tcpSocket:
+              port: ldaps
+          livenessProbe:
+            tcpSocket:
+              port: ldaps
           ports:
             - name: ldaps
               containerPort: 10636
@@ -142,7 +162,7 @@ spec:
             - name: run
               mountPath: /run/slapd
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml .Values.resources.haproxy | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
