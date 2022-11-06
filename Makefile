@@ -7,12 +7,16 @@ CERT_SUBJ = /CN=*.slapd.openldap.svc.cluster.local
 define MESSAGE
 ================================================================================
 
-Modify the kustomization.yaml in the 'examples' directory as needed.
+The external TLS certificate and its private key need to be added
+to the 'examples/external.pem' file.
+
+Then, modify the kustomization.yaml in the 'examples' directory as needed.
+
 Check the resources to be applied:
 
     kubectl kustomize examples
 
-Then, apply the resources:
+Finally, apply the resources:
 
     kubectl apply -k examples
 
@@ -45,8 +49,8 @@ certs:
 			-out cert.crt
 
 	cp $(TMPDIR)/ca.crt ./examples/ca.pem
-	cp $(TMPDIR)/cert.crt ./examples/cert.pem
-	cat $(TMPDIR)/cert.key >> ./examples/cert.pem
+	cp $(TMPDIR)/cert.crt ./examples/internal.pem
+	cat $(TMPDIR)/cert.key >> ./examples/internal.pem
 
 	rm -rf $(TMPDIR)
 
