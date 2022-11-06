@@ -16,7 +16,7 @@ Check the resources to be applied:
 
     kubectl kustomize examples
 
-Fiannly, apply the resources:
+Finally, apply the resources:
 
     kubectl apply -k examples
 
