@@ -57,9 +57,6 @@ spec:
           emptyDir: {}
         - name: run
           emptyDir: {}
-          # Use the resources of the slapd process
-          resources:
-            {{- toYaml .Values.resources.slapd | nindent 12 }}
       initContainers:
         - name: init-volumes
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -83,6 +80,9 @@ spec:
               mountPath: /etc/ldap/slapd.d
             - name: run
               mountPath: /run/slapd
+          # Use the resources of the slapd process
+          resources:
+            {{- toYaml .Values.resources.slapd | nindent 12 }}
         - name: init-config
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
