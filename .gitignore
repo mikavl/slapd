@@ -1,3 +1,0 @@
-examples/**
-!examples/kustomization.yaml
-!examples/namespace.yaml

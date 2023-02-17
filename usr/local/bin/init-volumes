@@ -1,7 +1,0 @@
-#!/bin/sh
-
-set -e
-
-mkdir -p /data/accesslog
-chown -R 10000:10000 /data /etc/ldap/slapd.d /run/slapd
-chmod 0700 /data /data/accesslog /etc/ldap/slapd.d /run/slapd
