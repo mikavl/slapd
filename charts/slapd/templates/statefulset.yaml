@@ -12,7 +12,7 @@ spec:
       {{- include "slapd.selectorLabels" . | nindent 6 }}
   volumeClaimTemplates:
     - metadata:
-        name: {{ include "slapd.fullname" . }}
+        name: data
       spec:
         accessModes:
           - "ReadWriteOnce"
@@ -37,28 +37,16 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
-        - name: secrets-external
+        - name: secret
           secret:
-            secretName: {{ include "slapd.fullname" . }}-external
-            defaultMode: 0400
-        - name: secrets-internal
-          secret:
-            secretName: {{ include "slapd.fullname" . }}-internal
-            defaultMode: 0400
-        - name: secrets-syncrepl
-          secret:
-            secretName: {{ include "slapd.fullname" . }}-syncrepl
-            defaultMode: 0400
-        - name: config
-          configMap:
-            name: {{ include "slapd.fullname" . }}
+            secretName: {{ include "slapd.fullname" . }}
             defaultMode: 0400
         - name: etc
           emptyDir: {}
         - name: run
           emptyDir: {}
       initContainers:
-        - name: init-volumes
+        - name: init
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
@@ -72,36 +60,21 @@ spec:
               drop:
                 - all
           command:
-            - /usr/local/bin/init-volumes
+            - /bin/sh
+          args:
+            - -c
+            - >-
+              mkdir -p /var/lib/ldap/accesslog
+              && chown -R 10000:10000 /var/lib/ldap \
+              && chmod 0700 /var/lib/ldap /var/lib/ldap/accesslog \
+              && rm -rf /etc/ldap/slapd.d/*
           volumeMounts:
             - name: {{ include "slapd.fullname" . }}
-              mountPath: /data
+              mountPath: /var/lib/ldap
             - name: etc
               mountPath: /etc/ldap/slapd.d
             - name: run
               mountPath: /run/slapd
-          # Use the resources of the slapd process
-          resources:
-            {{- toYaml .Values.resources.slapd | nindent 12 }}
-        - name: init-config
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command:
-            - /usr/local/bin/init-config
-          volumeMounts:
-            - name: config
-              mountPath: /config
-              readOnly: true
-            - name: secrets-syncrepl
-              mountPath: /secrets/syncrepl
-              readOnly: true
-            - name: {{ include "slapd.fullname" . }}
-              mountPath: /data
-            - name: etc
-              mountPath: /etc/ldap/slapd.d
-          # Use the resources of the slapd process
           resources:
             {{- toYaml .Values.resources.slapd | nindent 12 }}
       containers:
@@ -110,59 +83,29 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command:
-            - /usr/local/bin/exec-slapd
           readinessProbe:
             exec:
               command:
-                - /usr/local/bin/health-slapd
+                - /usr/local/bin/ldap-attr.sh
+                - cn=Time,cn=Monitor
+                - cn=Uptime
+                - monitoredInfo
           livenessProbe:
             exec:
               command:
-                - /usr/local/bin/health-slapd
+                - /usr/local/bin/ldap-attr.sh
+                - cn=Time,cn=Monitor
+                - cn=Uptime
+                - monitoredInfo
           volumeMounts:
-            - name: {{ include "slapd.fullname" . }}
-              mountPath: /data
+            - name: data
+              mountPath: /var/lib/ldap
             - name: etc
               mountPath: /etc/ldap/slapd.d
             - name: run
               mountPath: /run/slapd
           resources:
             {{- toYaml .Values.resources.slapd | nindent 12 }}
-        - name: haproxy
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command:
-            - /usr/local/bin/exec-haproxy
-          readinessProbe:
-            tcpSocket:
-              port: ldaps
-          livenessProbe:
-            tcpSocket:
-              port: ldaps
-          ports:
-            - name: ldaps
-              containerPort: 10636
-              protocol: TCP
-            - name: ldaps-syncrepl
-              containerPort: 10637
-              protocol: TCP
-          volumeMounts:
-            - name: secrets-external
-              mountPath: /secrets/external
-              readOnly: true
-            - name: secrets-internal
-              mountPath: /secrets/internal
-              readOnly: true
-            - name: config
-              mountPath: /config
-              readOnly: true
-            - name: run
-              mountPath: /run/slapd
-          resources:
-            {{- toYaml .Values.resources.haproxy | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

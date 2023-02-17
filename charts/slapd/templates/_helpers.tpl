@@ -60,31 +60,3 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
-{{- define "slapd.identityDN" -}}
-gidNumber={{ .Values.podSecurityContext.runAsGroup }}+uidNumber={{ .Values.podSecurityContext.runAsUser }},cn=peercred,cn=external,cn=auth
-{{- end }}
-
-{{- define "slapd.managerDN" -}}
-cn=manager,{{ .Values.suffix }}
-{{- end }}
-
-{{- define "slapd.replicatorDN" -}}
-cn=replicator,{{ .Values.suffix }}
-{{- end }}
-
-{{- define "slapd.usersOU" -}}
-ou=users,{{ .Values.suffix }}
-{{- end }}
-
-{{- define "slapd.servicesOU" -}}
-ou=services,{{ .Values.suffix }}
-{{- end }}
-
-{{- define "slapd.commonName" -}}
-{{ include "slapd.fullname" . }}-0.{{ include "slapd.fullname" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
-{{- end }}
-
-{{- define "slapd.provider" -}}
-{{ include "slapd.commonName" . }}:10637
-{{- end }}

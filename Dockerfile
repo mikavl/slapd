@@ -15,6 +15,7 @@ RUN apt-get update \
       /var/lib/ldap \
  && chmod 0755 /docker-entrypoint.sh /usr/local/bin/ldap-attr.sh
 
+COPY --chown=root:root consumer.init.ldif provider.init.ldif /etc/ldap/
 COPY --chown=root:root schema /etc/ldap/schema/
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
