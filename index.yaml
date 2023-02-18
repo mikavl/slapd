@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  slapd:
+  - apiVersion: v2
+    appVersion: main
+    created: "2023-02-18T09:21:54.404135937Z"
+    description: An OpenLDAP Helm chart for Kubernetes
+    digest: f6004e14f304f905a23bd3ffd4b10daf12dfbe75033e22fe10b4b548c944d041
+    name: slapd
+    type: application
+    urls:
+    - https://github.com/mikavl/slapd/releases/download/slapd-0.3.0/slapd-0.3.0.tgz
+    version: 0.3.0
+generated: "2023-02-18T09:21:54.40414234Z"
