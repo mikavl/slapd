@@ -11,13 +11,13 @@ case "$(hostname)" in
         ;;
 esac
 
-credentials=
-manager=
-provider=
-replicator=
-services=
-suffix=
-users=
+credentials="$(cat /secret/credentials)"
+manager="$(cat /secret/manager)"
+provider="$(cat /secret/provider)"
+replicator="$(cat /secret/replicator)"
+services="$(cat /secret/services)"
+suffix="$(cat /secret/suffix)"
+users="$(cat /secret/users)"
 
 sed -E \
     -e "s/@CREDENTIALS@/$credentials/" \

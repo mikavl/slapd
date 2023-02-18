@@ -75,8 +75,10 @@ spec:
               mountPath: /etc/ldap/slapd.d
             - name: run
               mountPath: /run/slapd
+            - name: secret
+              mountPath: /secret
           resources:
-            {{- toYaml .Values.resources.slapd | nindent 12 }}
+            {{- toYaml .Values.resources | nindent 12 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -104,8 +106,10 @@ spec:
               mountPath: /etc/ldap/slapd.d
             - name: run
               mountPath: /run/slapd
+            - name: secret
+              mountPath: /secret
           resources:
-            {{- toYaml .Values.resources.slapd | nindent 12 }}
+            {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

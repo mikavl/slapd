@@ -9,10 +9,6 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-clusterDomain: cluster.local
-
-suffix: dc=home,dc=arpa
-
 persistence:
   storageClassName: ""
   size: 1Gi
